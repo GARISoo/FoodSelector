@@ -5,6 +5,7 @@ const morgan = require('./middleware/morgan')
 const mongoose = require('mongoose')
 const cookieParser = require("cookie-parser")
 const routes = require('./routes/index')
+const startup = require('./startup/index')
 
 // express app
 const app = express()
@@ -37,6 +38,7 @@ mongoose
     // listen for requests
     app.listen(process.env.PORT, async () => {
       console.log('connected to db & listening on port', process.env.PORT)
+      await startup()
     })
   })
   .catch((error) => {

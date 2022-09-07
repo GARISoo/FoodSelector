@@ -113,7 +113,6 @@ const Login = () => {
 
   const handleRegister = async () => {
     setError('');
-    console.log(name, password, email);
 
     try {
       const response = await fetch(
@@ -172,6 +171,11 @@ const Login = () => {
     }
   };
 
+  const handleGuest = async () => {
+    await AsyncStorage.setItem('guest', JSON.stringify({guestId: 0}));
+    dispatch({type: 'GUEST_TOGGLE', payload: true});
+  };
+
   const handleButton = () => {
     isRegistering ? handleRegister() : handleLogin();
   };
@@ -207,6 +211,11 @@ const Login = () => {
           <Animated.View style={buttonsAnimatedStyle}>
             <Pressable style={styles.button} onPress={registerHandler}>
               <Text style={styles.buttonText}>REGISTER</Text>
+            </Pressable>
+          </Animated.View>
+          <Animated.View style={buttonsAnimatedStyle}>
+            <Pressable style={styles.buttonGuest} onPress={handleGuest}>
+              <Text style={styles.buttonText}>CONTINUE AS GUEST</Text>
             </Pressable>
           </Animated.View>
           <Animated.View style={[styles.formInputContainer, formAnimatedStyle]}>

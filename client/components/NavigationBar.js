@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {NavigationContainer} from '@react-navigation/native';
+import {NavigationContainer, DefaultTheme} from '@react-navigation/native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faDrumstickBite, faBookSkull} from '@fortawesome/free-solid-svg-icons';
@@ -20,6 +20,9 @@ const NavigationBar = () => {
     <NavigationContainer>
       <Tab.Navigator
         initialRouteName={eatName}
+        tabBarOptions={{
+          showLabel: false,
+        }}
         screenOptions={({route}) => ({
           tabBarIcon: ({focused}) => {
             let iconName;
@@ -46,9 +49,13 @@ const NavigationBar = () => {
             backgroundColor: 'rgb(102, 0, 0)',
             height: 50,
             padding: 5,
-          },
-          tabBarItemStyle: {
-            marginBottom: 5,
+            borderTopWidth: 0,
+            position: 'absolute',
+            bottom: 25,
+            left: 20,
+            right: 20,
+            elevation: 0,
+            borderRadius: 15,
           },
           unmountOnBlur: false,
           headerShown: false,
