@@ -1,13 +1,12 @@
 import * as React from 'react';
-import {NavigationContainer, DefaultTheme} from '@react-navigation/native';
+import {NavigationContainer} from '@react-navigation/native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faDrumstickBite, faBookSkull} from '@fortawesome/free-solid-svg-icons';
-import styles from './NavigationBarStyles';
 
 // Screens
-import FoodScreen from './screens/FoodScreen';
-import SelectionScreen from './screens/SelectionScreen';
+import FoodScreen from './screens/FoodScreen/FoodScreen';
+import SelectionScreen from './screens/SelectionScreen/SelectionScreen';
 
 //Screen names
 const eatName = 'EAT';
@@ -37,7 +36,7 @@ const NavigationBar = () => {
               focused ? (size = 25) : (size = 20);
             }
 
-            focused ? (color = 'white') : (color = 'rgb(255, 255, 255, 0.7)');
+            focused ? (color = 'white') : (color = 'rgba(255, 255, 255, 0.7)');
 
             return (
               <FontAwesomeIcon icon={iconName} color={color} size={size} />

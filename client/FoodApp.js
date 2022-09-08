@@ -6,7 +6,7 @@ import {useAuthContext} from './hooks/useAuthContext';
 const FoodApp = () => {
   const {user} = useAuthContext();
 
-  return user ? <Login /> : <NavigationBar />;
+  return !user ? <Login /> : <NavigationBar />;
 };
 
 export default FoodApp;

@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 const bcrypt = require('bcrypt')
 const validator = require('validator')
-
+const Restaurant = require('./restaurantModel')
 const Schema = mongoose.Schema
 
 const userSchema = new Schema({
@@ -24,6 +24,10 @@ const userSchema = new Schema({
       default: 1000,
     },
     Admin: Number,
+  },
+  filteredRestaurants: {
+    type: [mongoose.Schema.Types.ObjectId],
+    ref: "Restaurant"
   },
   createdAt: {
     type: Date,
@@ -55,9 +59,9 @@ userSchema.statics.signup = async function ({email, fullName, password}) {
 
   const salt = await bcrypt.genSalt(10)
   const hash = await bcrypt.hash(password, salt)
-
-  console.log({email, hash, fullName})
-  const user = await this.create({ email, password: hash, fullName })
+  const restaurantIds = await Restaurant.distinct('_id')
+  console.log(restaurantIds)
+  const user = await this.create({ email, password: hash, fullName, filteredRestaurants: restaurantIds })
 
   return user
 }

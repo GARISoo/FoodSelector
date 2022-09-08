@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-
+const User = require('./userModel');
 const Schema = mongoose.Schema
 
 const restaurantSchema = new Schema({
@@ -21,17 +21,5 @@ const restaurantSchema = new Schema({
     default: () => new Date(),
   },
 })
-
-restaurantSchema.statics.getRandom = async function() {
-  const restaurants = await this.find({})
-  const randomIndex = Math.floor(Math.random() * restaurants.length)
-  const randomRestaurant = restaurants[randomIndex]
-
-  if (!restaurants.length) {
-    throw Error("No restaurants found")
-  }
-
-  return randomRestaurant
-}
 
 module.exports = mongoose.model('Restaurant', restaurantSchema)

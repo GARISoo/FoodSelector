@@ -1,17 +1,88 @@
 const express = require("express")
 const Restaurant = require('../models/restaurantModel')
-
+const RestaurantService = require("../services/RestaurantService")
+const requireAuth = require("../middleware/requireAuth")
 const router = express.Router()
 
+// require auth for all season routes
+router.use(requireAuth)
+
 // get random restaurant
-router.get("/random", async (req, res) => {
+router.get("/random/:activeFilters", async (req, res) => {
+  const { activeFilters } = req.params
+  const { _id } = req.user;
+
+  const filtersArr = activeFilters.split(',')
+
   try {
-    const restaurant = await Restaurant.getRandom()
+    const restaurant = await RestaurantService.getRandom({ userId: _id, filtersArr })
 
     res.send({
       data: restaurant,
       status: 'success',
       message: 'Random restaurant been found!',
+    })
+  } catch (error) {
+    res.send({
+      data: null,
+      status: 'error',
+      message: error.message,
+    })
+  }
+})
+
+// get all restaurants
+router.get("/", async (req, res) => {
+  try {
+    const restaurants = await Restaurant.find({})
+
+    res.send({
+      data: restaurants,
+      status: 'success',
+      message: 'Got all restaurants!',
+    })
+  } catch (error) {
+    res.send({
+      data: null,
+      status: 'error',
+      message: error.message,
+    })
+  }
+})
+
+// get all user restaurants
+router.get("/user", async (req, res) => {
+  const { _id } = req.user;
+
+  try {
+    const restaurants = await RestaurantService.getUserRestaurants({ userId: _id })
+
+    res.send({
+      data: restaurants,
+      status: 'success',
+      message: 'Got all restaurants!',
+    })
+  } catch (error) {
+    res.send({
+      data: null,
+      status: 'error',
+      message: error.message,
+    })
+  }
+})
+
+// get all user restaurants
+router.patch("/toggle", async (req, res) => {
+  const { _id } = req.user;
+  const { restaurantId } = req.body;
+
+  try {
+    await RestaurantService.toggleUserRestaurants({ userId: _id, restaurantId })
+
+    res.send({
+      data: null,
+      status: 'success',
+      message: 'Got all restaurants!',
     })
   } catch (error) {
     res.send({
