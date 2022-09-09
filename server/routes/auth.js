@@ -34,28 +34,4 @@ router.post("/login", async (req, res) => {
   }
 })
 
-// logout route
-router.post("/logout", requireAuth,verifyRoles(ROLE_LIST.User), async (req, res) => {
-  const { user } = req
-
-  try {
-
-    await UsersService.logoutUser(user)
-    
-    res.clearCookie('accessCookie')
-
-    res.send({
-      data: null,
-      status: 'success',
-      message: 'User logged out successfully',
-    })
-  } catch (error) {
-    res.send({
-      data: null,
-      status: 'error',
-      message: error.message,
-    })
-  }
-} )
-
 module.exports = router

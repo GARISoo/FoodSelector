@@ -2,7 +2,7 @@ import {StyleSheet, Dimensions} from 'react-native';
 
 const {height, width} = Dimensions.get('screen');
 
-const LoginStyles = StyleSheet.create({
+const LoginScreenStyles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'flex-end',
@@ -112,4 +112,4 @@ const LoginStyles = StyleSheet.create({
   },
 });
 
-export default LoginStyles;
+export default LoginScreenStyles;

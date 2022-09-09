@@ -1,5 +1,4 @@
 const mongoose = require('mongoose')
-const User = require('./userModel');
 const Schema = mongoose.Schema
 
 const restaurantSchema = new Schema({
@@ -14,6 +13,10 @@ const restaurantSchema = new Schema({
   },
   img: {
     type: String,
+  },
+  postedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User"
   },
   createdAt: {
     type: Date,

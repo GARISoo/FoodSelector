@@ -1,11 +1,11 @@
 const AccessTokenService = require('./AccessTokenService')
 const User = require('../models/userModel')
+const Restaurant = require('../models/restaurantModel')
 
 class UsersService {
   static async loginUser({ userAgent, password, email }) {
     const user = await User.login(email, password)
     const roles = Object.values(user.roles).filter(Boolean)
-    const { lastFiveGames, avatar, points } = user
 
     // create a token
     const { token } = await AccessTokenService.createToken({
@@ -17,40 +17,38 @@ class UsersService {
       email,
       token,
       userId: user._id,
-      avatar,
-      lastFiveGames,
       roles,
-      points,
+    }
+  }
+
+  static async createGuest({ userAgent }) {
+    const randomNumber = Math.floor(Math.random() * 77777777)
+    const email = `Guest${randomNumber}@guest.com`
+    const fullName = `Guest${randomNumber}`
+    const password = `Guest${randomNumber}!`
+    const restaurantIds = await Restaurant.distinct('_id')
+    const roles = {Guest: 777}
+    const newGuest = await User.create({email, fullName, password, filteredRestaurants: restaurantIds, roles})
+
+    // create a token
+    const { token } = await AccessTokenService.createToken({
+      userId: newGuest._id,
+      userAgent,
+    })
+
+    return {
+      email,
+      token,
+      userId: newGuest._id,
+      roles,
     }
   }
 
   // logout user
   static async logoutUser(user) {
     const { token } = user
+
     await AccessTokenService.deleteToken(token)
-  }
-
-  // delete user
-  static async deleteUser({ email }) {
-    await User.delete(email)
-  }
-
-  // get all users
-  static async getAllUsers() {
-    const users = await User.find({})
-
-    if (!users) {
-      throw new Error("No users found")
-    }
-
-    users.sort((a, b) => b.points - a.points)
-
-    return { users }
-  }
-
-  // change password
-  static async changeUserPassword({ email, newPass }) {
-    await User.changePass(email, newPass)
   }
 }
 

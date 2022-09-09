@@ -1,6 +1,5 @@
-const AccessTokenService = require('./AccessTokenService')
+const Restaurant = require('../models/restaurantModel')
 const User = require('../models/userModel')
-const Restaurant = require('../models/userModel')
 
 class RestaurantService {
   static async getRandom({ userId, filtersArr }) {
@@ -25,7 +24,7 @@ class RestaurantService {
   }
 
   static async getUserRestaurants({ userId }) {
-    const { filteredRestaurants } = await User.findOne({ _id: userId })
+    const {filteredRestaurants} = await User.findOne({ _id: userId })
 
     return filteredRestaurants
   }
@@ -34,8 +33,6 @@ class RestaurantService {
     const user = await User.findOne({ _id: userId })
     
     const restaurantAlreadyChecked = user.filteredRestaurants.includes(restaurantId)
-
-    console.log(restaurantAlreadyChecked)
     
     if (!restaurantAlreadyChecked) {
       user.filteredRestaurants = [...user.filteredRestaurants, restaurantId]
@@ -46,6 +43,23 @@ class RestaurantService {
     await user.save()
 
     return user
+  }
+
+    static async toggleAllUserRestaurants({ userId }) {
+    const user = await User.findOne({ _id: userId })
+
+    const anyRestaurantAlreadyChecked = user.filteredRestaurants.length
+
+    if (!anyRestaurantAlreadyChecked) {
+      const restaurantIds = await Restaurant.distinct('_id')
+      user.filteredRestaurants = restaurantIds
+    } else {
+      user.filteredRestaurants = []
+    }
+
+    await user.save()
+
+    return user.filteredRestaurants
   }
 }
 

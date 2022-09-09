@@ -20,14 +20,16 @@ import {
   faCow,
   faStar,
 } from '@fortawesome/free-solid-svg-icons';
+import BASE_URI from '../../../proxy';
 
-const FoodScreen = ({navigation}) => {
+const FoodScreen = () => {
   const [activeRestaurant, setActiveRestaurant] = useState(null);
   const [activeFilters, setActiveFilters] = useState([]);
   const [error, setError] = useState('Waiting for your command!');
   const rotation = useSharedValue(0);
   const buttonScale = useSharedValue(1);
   const imgOpacity = useSharedValue(1);
+
   const animatedStyles = useAnimatedStyle(() => {
     return {
       transform: [
@@ -142,23 +144,22 @@ const FoodScreen = ({navigation}) => {
   };
 
   const getRestaurant = async () => {
-    setError('');
-
     if (!activeFilters.length) {
       setError('No filters selected');
     } else {
       try {
         const response = await fetch(
-          `http://192.168.200.138:5000/api/restaurant/random/${activeFilters}`,
+          `${BASE_URI}/restaurant/random/${activeFilters}`,
         );
         const json = await response.json();
         const {data, status, message} = json;
 
         if (status === 'success') {
+          setError('');
           setActiveRestaurant(data);
         }
         if (status === 'error') {
-          console.log(message);
+          setError(message);
         }
       } catch (err) {
         console.log('Something went horribly wrong!');
@@ -200,7 +201,7 @@ const FoodScreen = ({navigation}) => {
       </View>
       {error && (
         <View style={styles.error}>
-          <Text style={styles.errorText}>No filters selected!</Text>
+          <Text style={styles.errorText}>{error}</Text>
         </View>
       )}
       {activeRestaurant && !error && (

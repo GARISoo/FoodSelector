@@ -1,7 +1,5 @@
 const express = require("express")
 const requireAuth = require("../middleware/requireAuth")
-const verifyRoles = require("../middleware/verifyRoles")
-const ROLE_LIST = require("../config/rolesList")
 const UsersService = require("../services/UsersService")
 const User = require('../models/userModel')
 
@@ -13,11 +11,12 @@ router.post("/login", async (req, res) => {
   const { email, password } = req.body
 
   try {
-    const response = await UsersService.loginUser({ email, password, userAgent })
+    const response = await UsersService.loginUser({email, password, userAgent})
 
     res.cookie('accessCookie', `Bearer ${response.token}`, {
       httpOnly: true,
       sameSite: 'strict',
+      expires: new Date(Date.now() + (1000 * 60 * 60 * 24 * 30)),
     })
 
     res.send({
@@ -34,10 +33,37 @@ router.post("/login", async (req, res) => {
   }
 })
 
+// login route
+router.post("/guest", async (req, res) => {
+  const userAgent = req.headers['user-agent'] || 'local placeholder';
+
+  try {
+    const guest = await UsersService.createGuest({userAgent})
+
+    res.cookie('accessCookie', `Bearer ${guest.token}`, {
+      httpOnly: true,
+      sameSite: 'strict',
+      expires: new Date(Date.now() + (1000 * 60 * 60 * 24 * 30)),
+    })
+
+    res.send({
+      data: guest,
+      status: 'success',
+      message: 'User logged in successfully',
+    })
+  } catch (error) {
+    res.send({
+      data: null,
+      status: 'error',
+      message: error.message,
+    })
+  }
+})
+
 // register a user route
 router.post('/signup', async (req, res) => {
   const { email, password, fullName } = req.body;
-
+  
   try {
     await User.signup({ email, fullName, password })
 
@@ -55,87 +81,28 @@ router.post('/signup', async (req, res) => {
   }
 })
 
-// require auth for all workout routes
+// require auth for all season routes
 router.use(requireAuth)
 
-router.get('/is-authorized', (req, res) => {
-  const { _id } = req.user;
+// logout route
+router.post("/logout", async (req, res) => {
+ const { user } = req
 
   try {
+    await UsersService.logoutUser(user)
+    
+    res.clearCookie('accessCookie')
+
     res.send({
-      data: { _id },
+      data: null,
       status: 'success',
-      message: 'Authorized!',
-    });
+      message: 'User logged out successfully',
+    })
   } catch (error) {
     res.send({
       data: null,
       status: 'error',
       message: error.message,
-    });
-  }
-});
-
-// give admin access route
-router.post("/promote/:email", verifyRoles(ROLE_LIST.Admin), async (req, res) => {
-  const { email } = req.params;
-
-  try {
-    await UsersService.promoteUser({ email })
-
-    res.send({
-      data: email,
-      message: `${email} promoted`,
-      status: "success",
-    })
-  } catch (error) {
-    res.send({
-      data: null,
-      message: error.message,
-      status: "error",
-    })
-  }
-})
-
-// remove admin access route
-router.post("/demote/:email", verifyRoles(ROLE_LIST.Admin), async (req, res) => {
-  const { email } = req.params
-  const { _id } = req.user
-
-  try {
-    await UsersService.demoteUser({ email, _id })
-
-    res.send({
-      data: email,
-      message: `${email} demoted`,
-      status: "success",
-    })
-  } catch (error) {
-    res.send({
-      data: null,
-      message: error.message,
-      status: "error",
-    })
-  }
-})
-
-// delete user route
-router.delete("/delete/:email", verifyRoles(ROLE_LIST.Admin), async (req, res) => {
-  const { email } = req.params
-
-  try {
-    await UsersService.deleteUser({ email })
-
-    res.send({
-      data: email,
-      message: `${email} deleted`,
-      status: "success",
-    })
-  } catch (error) {
-    res.send({
-      data: null,
-      message: error.message,
-      status: "error",
     })
   }
 })

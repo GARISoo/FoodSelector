@@ -50,6 +50,28 @@ router.get("/", async (req, res) => {
   }
 })
 
+// add new restaurant
+router.post("/", async (req, res) => {
+  const { restaurantName, selectedCategories } = req.body;
+  const { _id } = req.user;
+
+  try {
+    await Restaurant.create({name: restaurantName, category: selectedCategories, postedBy: _id})
+
+    res.send({
+      data: null,
+      status: 'success',
+      message: 'Done!',
+    })
+  } catch (error) {
+    res.send({
+      data: null,
+      status: 'error',
+      message: 'Something went wrong!',
+    })
+  }
+})
+
 // get all user restaurants
 router.get("/user", async (req, res) => {
   const { _id } = req.user;
@@ -83,6 +105,27 @@ router.patch("/toggle", async (req, res) => {
       data: null,
       status: 'success',
       message: 'Got all restaurants!',
+    })
+  } catch (error) {
+    res.send({
+      data: null,
+      status: 'error',
+      message: error.message,
+    })
+  }
+})
+
+// toggle all use restaurants 
+router.patch("/toggleAll", async (req, res) => {
+  const { _id } = req.user;
+
+  try {
+    const restaurants = await RestaurantService.toggleAllUserRestaurants({ userId: _id })
+    console.log(restaurants)
+    res.send({
+      data: restaurants,
+      status: 'success',
+      message: 'Toggled all restaurants!',
     })
   } catch (error) {
     res.send({

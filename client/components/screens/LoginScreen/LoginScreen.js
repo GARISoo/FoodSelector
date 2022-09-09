@@ -9,7 +9,7 @@ import {
   Keyboard,
   ImageBackground,
 } from 'react-native';
-import styles from './LoginStyles';
+import styles from './LoginScreenStyles';
 import Svg, {Image} from 'react-native-svg';
 import Animated, {
   useSharedValue,
@@ -21,9 +21,10 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useAuthContext} from './../../hooks/useAuthContext';
+import {useAuthContext} from '../../../hooks/useAuthContext';
+import BASE_URI from './../../../proxy';
 
-const Login = () => {
+const LoginScreen = () => {
   const [isRegistering, setIsRegistering] = useState(false);
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
@@ -115,17 +116,14 @@ const Login = () => {
     setError('');
 
     try {
-      const response = await fetch(
-        'http://192.168.200.138:5000/api/user/signup',
-        {
-          method: 'POST',
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({email, fullName: name, password}),
+      const response = await fetch(`${BASE_URI}/user/signup`, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
         },
-      );
+        body: JSON.stringify({email, fullName: name, password}),
+      });
       const json = await response.json();
       const {status, message} = json;
 
@@ -143,15 +141,12 @@ const Login = () => {
     setError('');
 
     try {
-      const response = await fetch(
-        'http://192.168.200.138:5000/api/auth/login',
-        {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          credentials: 'include',
-          body: JSON.stringify({email, password}),
-        },
-      );
+      const response = await fetch(`${BASE_URI}/user/login`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        credentials: 'include',
+        body: JSON.stringify({email, password}),
+      });
 
       const json = await response.json();
       const {status, data, message} = json;
@@ -172,8 +167,31 @@ const Login = () => {
   };
 
   const handleGuest = async () => {
-    await AsyncStorage.setItem('guest', JSON.stringify({guestId: 0}));
-    dispatch({type: 'GUEST_TOGGLE', payload: true});
+    setError('');
+
+    try {
+      const response = await fetch(`${BASE_URI}/user/guest`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        credentials: 'include',
+      });
+
+      const json = await response.json();
+      const {status, data, message} = json;
+
+      if (status === 'success') {
+        const {userId} = data;
+
+        // save the user to async storage
+        await AsyncStorage.setItem('user', JSON.stringify({userId}));
+
+        dispatch({type: 'LOGIN', payload: data});
+      } else if (status === 'error') {
+        setError(message);
+      }
+    } catch (err) {
+      setError('Something went horribly wrong!');
+    }
   };
 
   const handleButton = () => {
@@ -182,14 +200,14 @@ const Login = () => {
 
   return (
     <ImageBackground
-      source={require('../../assets/login-bricks.jpg')}
+      source={require('../../../assets/login-bricks.jpg')}
       style={styles.image}
       resizeMode="cover">
       <Animated.View style={styles.container}>
         <Animated.View style={[StyleSheet.absoluteFill, imageAnimatedStyle]}>
           <Svg height={height} width={width}>
             <Image
-              href={require('../../assets/login-background.jpg')}
+              href={require('../../../assets/login-background.jpg')}
               width={width}
               height={height}
               preserveAspectRatio="xMidYMid slice"
@@ -266,4 +284,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default LoginScreen;
