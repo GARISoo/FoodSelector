@@ -158,7 +158,9 @@ const SelectionScreen = () => {
                 <Text style={styles.title}>{name}</Text>
                 <View style={styles.categoryWrapper}>
                   {category.map(text => (
-                    <Text style={styles.category}>{text}</Text>
+                    <Text style={styles.category} key={Math.random() * 158654}>
+                      {text}
+                    </Text>
                   ))}
                 </View>
               </View>
