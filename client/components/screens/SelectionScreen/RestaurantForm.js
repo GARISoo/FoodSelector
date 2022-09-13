@@ -112,7 +112,7 @@ const RestaurantForm = ({onClose}) => {
         <Text style={styles.inputLabel}>Select categories:</Text>
         <View style={styles.checkboxContainer}>
           {availableCategories.map(category => (
-            <View style={styles.checkboxBox}>
+            <View style={styles.checkboxBox} key={category}>
               <Pressable
                 style={styles.smallCheckbox}
                 onPress={() => toggleCategory(category)}>

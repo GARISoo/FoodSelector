@@ -48,6 +48,7 @@ const requireAuth = async (req, res, next) => {
         _id: userId,
         token: updatedToken,
         email: user.email,
+        roles: user.roles
       }
 
       next()

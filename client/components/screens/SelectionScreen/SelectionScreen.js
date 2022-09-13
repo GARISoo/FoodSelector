@@ -21,6 +21,7 @@ const SelectionScreen = () => {
   const [formActive, setFormActive] = useState(false);
   const addBtnScale = useSharedValue(1);
   const {user} = useAuthContext();
+  console.log(user);
   const isGuest = 'Guest' in user.roles;
 
   const buttonScaling = async () => {
@@ -115,6 +116,7 @@ const SelectionScreen = () => {
 
   const closeForm = () => {
     setFormActive(false);
+    getAllRestaurants();
   };
 
   const openForm = () => {

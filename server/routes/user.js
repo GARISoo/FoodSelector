@@ -107,4 +107,22 @@ router.post("/logout", async (req, res) => {
   }
 })
 
+router.get('/is-authorized', (req, res) => {
+  const { user } = req;
+
+  try {
+    res.send({
+      data: user,
+      status: 'success',
+      message: 'Authorized!',
+    });
+  } catch (error) {
+    res.send({
+      data: null,
+      status: 'error',
+      message: error.message,
+    });
+  }
+});
+
 module.exports = router
